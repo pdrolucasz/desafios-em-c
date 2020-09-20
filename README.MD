@@ -1,0 +1,1 @@
+# Repositório voltado trabalhos avaliativos em C para faculdade
