@@ -21,7 +21,7 @@ void menu();
 */
 
 FILE *fp;
-char agendaTxt[] = "agenda.txt";
+char agendaTxt[] = "Agenda.txt";
 char agenda[ROW][COL];
 char dados[ROW][COL] = {"Nome", "Endereco", "Bairro", "Cidade", "Estado", "CEP", "Telefone", "Celular"};
 int numAgenda = 0;
@@ -72,28 +72,22 @@ void inserir()
 void listar()
 {
     char buffer[COL];
-    int i = 0;
-    for (int j = 0; j < ROW; ++j)
-        printf("%s: %s\n", dados[j], agenda[i]);
 
-    printf("\n\n");
     fp = fopen(agendaTxt, "r");
     if (!existeArquivo(agendaTxt))
         printf("Nao ha nenhum dado cadastrado!\n");
     else
     {
-        while (scanf(agendaTxt, "%s ", buffer) != NULL)//(fgets(buffer, COL, fp)!= NULL)
+        for (int i = 0; i < COL; ++i) //(fgets(buffer, COL, fp)!= NULL)
         {
-            printf("I: %d\n", i);
             if (i)
                 printf("%s: %s\n", dados[i], buffer);
             else
-                printf("%s", buffer);
-            ++i;
+                fgets(buffer, COL, fp
+            printf("%s\n", buffer);
         }
     }
     printf("\n\n");
-    //
 }
 
 void menu ()
@@ -145,9 +139,8 @@ void menu ()
 
 int main ()
 {
-    //printf("%s\n", agenda[0][0]);
-    //printf("%s\n", agenda[1][0]);
     menu();
 
     return 0;
 }
+,
