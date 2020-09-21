@@ -18,6 +18,7 @@ void interfaceJogo(int erros, int tamanho);
 void dificuldade();
 void jogar();
 void menu();
+void inserirPalavra(int podeInserir);
 void desenhaCaveira();
 void desenhaTrofeu();
 void zerar(int zeraExibidas);
@@ -33,6 +34,8 @@ char palavrasSecretas[ROW][LEN] = {"MELANCIA" ,
                                 "UMBIGO" ,
                                 "XICARA" ,
                                 "PIRIPAQUE"};
+
+int podeInserir = 0;
 
 char palavra[LEN], palavrasExibidas[ROW], palavraEncripto[LEN], letraJogada[26];
 
@@ -197,11 +200,13 @@ void jogar()
 
     interfaceJogo(erros, tamanho);
     if (perdeu){
+        podeInserir = 0;
         desenhaCaveira();
         printf("Deu forca! Suas chances acabaram!\n\nA palavra era %s.\n\n", palavra);
     }
     else{
         desenhaTrofeu();
+        podeInserir = 1;
         printf("Parabens! Voce ganhou!\n\nA palavra era %s.\n\n", palavra);
     }
     Sleep(1000);
@@ -215,9 +220,10 @@ void menu()
         int escolha = 0, indice;
         printf("1 - Jogar com uma palavra aleatoria.\n\n");
         printf("2 - Sair\n\n");
+        printf("3 - Inserir palavra\n\n");
         scanf("%d", &escolha);
-        while (escolha < 1 || escolha > 2){
-            printf("\nOpcao invalida! Escolha entre 1 e 2\n\n");
+        while (escolha < 1 || escolha > 3){
+            printf("\nOpcao invalida! Escolha entre 1 e 3\n\n");
             scanf("%d", &escolha);
         }
 
@@ -234,8 +240,20 @@ void menu()
         case 2: // Fim do loop
             printf("\nOpcao (2) escolhida...\n\n");
             return;
+        case 3:
+            printf("\nOpcao (3) escolhida...\n\n");
+            inserirPalavra(podeInserir);
+            break;
         }
     }
+}
+
+void inserirPalavra(int podeInserir)
+{
+    if (podeInserir)
+        printf("Pode inserir!\n\n");
+    else
+        printf("Nao pode inserir, venca uma partida!\n\n");
 }
 
 /// Limpa os dados de um jogo anterior, se for o primeiro jogo, zera o array de palavrasExibidas
