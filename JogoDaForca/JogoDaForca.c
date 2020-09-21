@@ -5,8 +5,13 @@
 #include <time.h>
 #include <windows.h>
 
-#define ROW 10
-#define LEN 20
+#define ROW 12
+#define LEN 30
+
+FILE *fp;
+int numLinhas = 0;
+char palavrasSorTxt[] = "palavrasSorT.txt";
+char categoriaS[3][15] = {"ALIMENTO", "ANIMAL", "COMPUTACAO"};
 
 int gerarAleatorio();
 void escolhePalavra();
@@ -24,20 +29,87 @@ void desenhaTrofeu();
 void zerar(int zeraExibidas);
 
 /// Variáveis globais
-char palavrasSecretas[ROW][LEN] = {"MELANCIA" ,
-                                "ZEBRA" ,
-                                "PONTEIRO" ,
-                                "COMPUTACAO" ,
-                                "AGEBSON" ,
-                                "JAVASCRIPT" ,
-                                "FLIPFLOP" ,
-                                "UMBIGO" ,
-                                "XICARA" ,
-                                "PIRIPAQUE"};
+char palavrasSorteadas[ROW][LEN] = {"MELANCIA" ,
+                                    "PERA" ,
+                                    "BANANA" ,
+                                    "CAJU" ,
+                                    "ZEBRA" ,
+                                    "MACACO" ,
+                                    "URUBU" ,
+                                    "LEBRE" ,
+                                    "FLIPFLOP" ,
+                                    "JAVASCRIPT" ,
+                                    "PONTEIRO" ,
+                                    "PYTHON" };
+                                    
+char palavrasSecretas[ROW][LEN];
 
 int podeInserir = 0;
 
+char categoriaPalavra[ROW][2] = {"1", "1", "1", "1", "2", "2", "2", "2", "3", "3", "3", "3"};
+
 char palavra[LEN], palavrasExibidas[ROW], palavraEncripto[LEN], letraJogada[26];
+
+/// Inicializar arquivo ao abrir jogo pela primeira vez
+void inicializaArquivo()
+{
+    fp = fopen(palavrasSorTxt, "w");
+    for (int i = 0; i < ROW; ++i){
+        if (i != ROW - 1)
+            fprintf(fp, "%s %s\n", palavrasSorteadas[i], categoriaPalavra[i]);
+        else
+            fprintf(fp, "%s %s", palavrasSorteadas[i], categoriaPalavra[i]);
+    }
+    fclose(fp);
+}
+
+/// Obter número de linhas do arquivo
+int obterLinhas() {
+	char buff[255];
+	
+	fp = fopen(palavrasSorTxt, "r");
+	
+	if(!fp){
+        printf("Gerando arquivo...\n");
+        inicializaArquivo();
+    }else {
+    	while (fgets(buff, 255, (FILE*)fp) != NULL){
+    		numLinhas ++;
+		}
+	}
+	fclose(fp);
+	
+	return numLinhas;
+}
+
+/// Carregar as palavras do arquivo
+void carregarAqruivo() {
+	obterLinhas();
+		
+	fp = fopen(palavrasSorTxt, "r");
+	
+	palavrasSecretas[numLinhas][LEN];
+	int categoria;
+	
+	for (int i = 0; i < numLinhas; ++i){
+	    fscanf(fp, "%s %d", palavrasSecretas[i], &categoria);
+    }
+	
+	fclose(fp);
+}
+
+/// Inserir palavra no arquivo
+void inserirNoArquivo() {
+	char palavra[1][30] = {"Girimun"};
+	int categoria = 1;
+	
+	fp = fopen(palavrasSorTxt, "a");
+    fprintf(fp, "%s %d\n", palavra, categoria);
+	
+	carregarAqruivo();
+	
+	fclose(fp);
+}
 
 /// Gera o número aleatório entre 0 e o número de palavras secretas
 int gerarAleatorio()
@@ -250,9 +322,21 @@ void menu()
 
 void inserirPalavra(int podeInserir)
 {
-    if (podeInserir)
-        printf("Pode inserir!\n\n");
-    else
+    if (podeInserir){
+    	printf("Pode inserir!\n\n");
+    	
+    	/*int escolha;
+    	char palavra[LEN];
+    	for(int i = 0; i < 3; i++) {
+    		printf("%d - %s.\n\n", i + 1, categoriaS[i]);
+		}
+        scanf("%d", &escolha);
+        
+        printf("\n\nDigite a palavra para acrescentar: ");
+    	gets(palavra);*/
+    	
+        inserirNoArquivo();
+	}else
         printf("Nao pode inserir, venca uma partida!\n\n");
 }
 
@@ -264,6 +348,7 @@ void zerar(int zeraExibidas)
     }
     letraJogada[0] = '\0';
     if (zeraExibidas)
+    	carregarAqruivo();
         for (int j = 0; j < ROW; ++j)
             palavrasExibidas[j] = '0';
 }
