@@ -1,0 +1,27 @@
+Cadastro 1:
+Edu Catunda ta entendendo
+Avenida
+Parangaba ihu
+Fortaleza pae
+CE
+12355
+123416467
+12413546
+Cadastro 2:
+Joaozim Pivet
+Rua
+Pirambu
+Fortaaleza
+CE
+12346754
+345235
+31256546
+Cadastro 3:
+Vetim
+Beco
+Bom Jardim
+Fortaleza pae
+CE
+1563452
+112343
+12545466
