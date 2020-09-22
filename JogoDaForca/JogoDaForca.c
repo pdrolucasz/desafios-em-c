@@ -11,7 +11,7 @@
 
 FILE *fp;
 int numLinhas = 0;
-char palavrasSorTxt[] = "palavrasSorT.txt";
+char palavrasSorTxt[] = "palavrasJogo.txt";
 char categoriaS[3][15] = {"ALIMENTO", "ANIMAL", "COMPUTACAO"};
 
 int gerarAleatorio();
