@@ -72,7 +72,7 @@ void inicializaArquivo()
         int categoria;
 
         for (int i = 0; i < numLinhas; ++i){
-            fscanf(fp, "%s %d", buff, &categoria); // Descarta o inteiro da categoria presente no arquivo, o importante é a palavra
+            fscanf(fp, "\n%s %d", buff, &categoria); // Descarta o inteiro da categoria presente no arquivo, o importante é a palavra
             strcpy(palavrasSecretas[i], buff); // Adiciona cada palavra nova na palavrasSecretas para utilização no jogo.
         }
         fclose(fp);
@@ -96,14 +96,28 @@ int obterLinhas() {
 void inserirNoArquivo() {
 	char palavra[1][30] = {"Girimun"};
 	int categoria = 1;
+	int possible = 0;
+	
+	fp = fopen(palavrasSorTxt, "r");
+    char buff[LEN];
+    int categoriaFP;
 
-	fp = fopen(palavrasSorTxt, "a");
-    fprintf(fp, "%s %d\n", palavra[0], categoria);
-	fclose(fp);
-
-	inicializaArquivo();
-	Sleep(1000);
-    system("cls");
+    for (int i = 0; i < numLinhas; ++i){
+        fscanf(fp, "%s %d\n", buff, &categoriaFP);
+        possible = strcmp(palavra, buff);
+    }
+    fclose(fp);
+    
+    if (possible == 0) {
+        printf("Palavra ja adicionada.\n");
+	}else {
+		fp = fopen(palavrasSorTxt, "a");
+	    fprintf(fp, "\n%s %d", palavra[0], categoria);
+		fclose(fp);
+		inicializaArquivo();
+		Sleep(1000);
+	    system("cls");
+	}
 }
 
 /// Gera o número aleatório entre 0 e o número de palavras secretas
@@ -200,15 +214,17 @@ void interfaceJogo(int hangman, int tamanho)
     printf("\n\n");
 
     printf("Palavra Secreta: ");
-    for (int j = 0; j < tamanho; ++j)
-        if (palavraEncripto[j] != '*'){
-            //BOOP
-            printf("%c", palavraEncripto[j]); // * * * B S * N
-            Sleep(550);
-        }
-        else
-            //beep
+    for (int j = 0; j < tamanho; ++j) {
+    	if (palavraEncripto[j] != '*'){
+            //Sleep(550);
+            //Beep(500, 550);
             printf("%c", palavraEncripto[j]);
+        }else {
+            //Sleep(550);
+            //Beep(1000, 550);
+            printf("%c", palavraEncripto[j]);
+		}
+	}
     printf("\n\n");
     getchar();
 }
