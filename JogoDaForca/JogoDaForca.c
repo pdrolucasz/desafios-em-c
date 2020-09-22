@@ -10,7 +10,7 @@
 
 FILE *fp;
 int numLinhas = 0;
-char palavrasSorTxt[] = "palavrasSorT.txt";
+char palavrasSorTxt[] = "palavrasJogo.txt";
 char categoriaS[3][15] = {"ALIMENTO", "ANIMAL", "COMPUTACAO"};
 
 int gerarAleatorio();
@@ -82,6 +82,19 @@ int obterLinhas() {
 	return numLinhas;
 }
 
+/// Inserir palavra no arquivo
+void inserirNoArquivo() {
+	char palavra[1][30] = {"PAO"};
+	int categoria = 1;
+	
+	fp = fopen(palavrasSorTxt, "a");
+    fprintf(fp, "%s %d\n", palavra, categoria);
+	
+	fclose(fp);
+	
+	carregarAqruivo();
+}
+
 /// Carregar as palavras do arquivo
 void carregarAqruivo() {
 	obterLinhas();
@@ -96,19 +109,6 @@ void carregarAqruivo() {
     }
 	
 	fclose(fp);
-}
-
-/// Inserir palavra no arquivo
-void inserirNoArquivo() {
-	char palavra[1][30] = {"PAO"};
-	int categoria = 1;
-	
-	fp = fopen(palavrasSorTxt, "a");
-    fprintf(fp, "%s %d\n", palavra, categoria);
-	
-	fclose(fp);
-	
-	carregarAqruivo();
 }
 
 /// Gera o número aleatório entre 0 e o número de palavras secretas
@@ -347,10 +347,11 @@ void zerar(int zeraExibidas)
         palavraEncripto[i] = '*';
     }
     letraJogada[0] = '\0';
-    if (zeraExibidas)
+    if (zeraExibidas){
     	carregarAqruivo();
         for (int j = 0; j < ROW; ++j)
             palavrasExibidas[j] = '0';
+	}
 }
 
 void desenhaCaveira() // Desenha a caveira quando o usuário perde
