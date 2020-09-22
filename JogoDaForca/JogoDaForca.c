@@ -8,6 +8,7 @@
 #define ROW 12
 #define LEN 30
 #define MAX 100
+#define CAT 3
 
 FILE *fp;
 int numLinhas = 0;
@@ -61,11 +62,10 @@ void inicializaArquivo()
             if (i != ROW - 1)
                 fprintf(fp, "%s %s\n", palavrasSorteadas[i], categoriaPalavra[i]);
             else
-                fprintf(fp, "%s %s", palavrasSorteadas[i], categoriaPalavra[i]);
+                fprintf(fp, "%s %s\n", palavrasSorteadas[i], categoriaPalavra[i]);
         }
         fclose(fp);
-    }
-    else{ // Arquivo com palavras já existe. Pode haver novas palavras inseridas.
+    }else { // Arquivo com palavras já existe. Pode haver novas palavras inseridas.
         obterLinhas();
         fp = fopen(palavrasSorTxt, "r");
         char buff[LEN];
@@ -77,6 +77,23 @@ void inicializaArquivo()
         }
         fclose(fp);
     }
+}
+
+/// Escolhe as palavras de acordo com a categoria
+void escolheCategoria(int categoriaPS) {
+	obterLinhas();
+    fp = fopen(palavrasSorTxt, "r");
+    char buff[LEN];
+    int categoria;
+
+    for (int i = 0; i < numLinhas; ++i){
+        fscanf(fp, "\n%s %d", buff, &categoria);
+        if (categoria == categoriaPS) {
+            strcpy(palavrasSecretas[i], buff); // Adiciona cada palavra com a categoria escolhida na palavrasSecretas para utilização no jogo.
+		}
+    }
+    fclose(fp);
+    obterLinhas();
 }
 
 /// Obter número de linhas do arquivo
@@ -94,8 +111,20 @@ int obterLinhas() {
 
 /// Inserir palavra no arquivo
 void inserirNoArquivo() {
-	char palavra[1][30] = {"Girimun"};
-	int categoria = 1;
+	char palavra[1][30];
+	int categoria = 0;
+	
+	printf("Digite a palavra: ");
+	scanf("%s", palavra);
+	strupr(palavra);
+	
+	printf("Escolha uma categoria: \n\n");
+	for (int i = 0; i < CAT; i++) {
+		printf("%d - %s\n", i + 1, categoriaS[i]);
+	}
+	printf("\n\nDigite a categoria: ");
+	scanf("%d", &categoria);
+	
 	int possible = 0;
 	
 	fp = fopen(palavrasSorTxt, "r");
@@ -109,10 +138,10 @@ void inserirNoArquivo() {
     fclose(fp);
     
     if (possible == 0) {
-        printf("Palavra ja adicionada.\n");
+        printf("\n\nPalavra ja adicionada.\n\n");
 	}else {
 		fp = fopen(palavrasSorTxt, "a");
-	    fprintf(fp, "\n%s %d", palavra[0], categoria);
+	    fprintf(fp, "%s %d\n", palavra[0], categoria);
 		fclose(fp);
 		inicializaArquivo();
 		Sleep(1000);
@@ -161,6 +190,17 @@ int verifLetraJogada(char letra)
         if (letra == letraJogada[i])
             return 0;
     return 1;
+}
+
+/// Verifica se a letra é um número
+int verifLetraEspecial(char letra)
+{
+	if ((letra >= 'a' && letra <= 'z') || 
+	(letra >= 'A' && letra <= 'Z')) {
+		return 1;
+	}else {
+		return 0;
+	}
 }
 
 /// Verifica se a palavra possui a letra
@@ -272,11 +312,23 @@ void jogar()
         printf("Digite uma letra: ");
         scanf("%c", &letra);
         letra = toupper(letra);
+        
+        while (!verifLetraEspecial(letra)) {
+        	printf("\n\nIsso nao e uma letra (•_•), Digite uma letra: ");
+        	scanf(" %c", &letra);
+            letra = toupper(letra);
+		}
 
         while (!verifLetraJogada(letra)){
             printf("\n\nEssa letra ja foi jogada! Digite uma letra: ");
             scanf(" %c", &letra);
             letra = toupper(letra);
+            
+            while (!verifLetraEspecial(letra)) {
+	        	printf("\n\nIsso nao e uma letra (•_•), Digite uma letra: ");
+	        	scanf(" %c", &letra);
+	            letra = toupper(letra);
+			}
         }
         strncat(letraJogada, &letra, 1);
         system("cls");
