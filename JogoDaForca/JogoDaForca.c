@@ -100,15 +100,15 @@ void carregarAqruivo() {
 
 /// Inserir palavra no arquivo
 void inserirNoArquivo() {
-	char palavra[1][30] = {"Girimun"};
+	char palavra[1][30] = {"PAO"};
 	int categoria = 1;
 	
 	fp = fopen(palavrasSorTxt, "a");
     fprintf(fp, "%s %d\n", palavra, categoria);
 	
-	carregarAqruivo();
-	
 	fclose(fp);
+	
+	carregarAqruivo();
 }
 
 /// Gera o número aleatório entre 0 e o número de palavras secretas
