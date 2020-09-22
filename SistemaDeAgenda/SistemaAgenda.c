@@ -102,7 +102,6 @@ void listar()
 int main ()
 {
     numCadastro = obterNumCadastro();
-    printf("Num Cadastro: %d\n", numCadastro);
     menu();
 
     return 0;
