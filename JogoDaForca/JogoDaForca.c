@@ -426,7 +426,7 @@ void zerar(int primeiraVez)
         palavraEncripto[i] = '*';
     }
     letraJogada[0] = '\0';
-    inicializaArquivo();
+    escolheCategoria(1);
     if (primeiraVez){
         for (int j = 0; j < ROW; ++j)
             palavrasExibidas[j] = '0';
