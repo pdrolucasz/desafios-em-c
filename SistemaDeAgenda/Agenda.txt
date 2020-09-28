@@ -43,3 +43,66 @@ pestado
 1234145
 123154345
 231534354
+Cadastro 6:
+Naruto
+Avenida
+Parangaba ihu
+Fortaleza-pae
+CE
+12355
+123416467
+12413546
+Cadastro 7:
+Eryka
+Rua
+Pirambu
+Fortaleza
+CE
+12346754
+345235
+31256546
+Cadastro 8:
+Agebson
+Beco
+Bom Jardim
+Fortaleza-pae
+CE
+1563452
+112343
+12545466
+Cadastro 9:
+Daniel
+rua do p
+pairro
+Fortaleza-pae
+pestado
+pep30303
+123123123
+32342354
+Cadastro 10:
+Pedro
+rua de pEderpdep
+pairro
+Fortaleza
+pestado
+1234145
+123154345
+231534354
+Cadastro 11:
+G2A
+Eae Vei
+Parangaba
+Rio de Janeiro
+Rio de Janeiro
+902930293
+29329203
+309293092
+Cadastro 12:
+Eduardo
+Av gen 
+Parangaba 
+Ceara 
+123432
+123123   
+123123   
+232
