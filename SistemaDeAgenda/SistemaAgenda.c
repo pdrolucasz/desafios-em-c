@@ -22,12 +22,6 @@ void menu();
 void menu2();
 void menu3();
 int obterNumCadastro(int *pLinhas, int *pQntCad);
-/**
-- o sistema deverá ter um menu de inserção, alteração e deleção de cadastros;
-- deverá permitir também consulta aos dados por nome, cidade ou estado;,
-- os dados ficarão gravados em arquivo Texto; - CONFERE
-- os cadastros deverão conter: nome, endereço, bairro, cidade, estado, cep, telefone e celular. - CONFERE
-*/
 
 FILE *fp; // File principal
 char agendaTxt[] = "Agenda.txt";
@@ -49,7 +43,7 @@ int alterarCadastro(char numCad[4])
             strcpy(arquivo[linhas], strtok(buff, "\n"));        // Pega a linha de cadastro
             ++encontrou; ++linhas;                              // Pula a linha
             for (int linha = 0; linha < 8; ++linha, ++linhas){  // Lê as 8 linhas de dados do cadastro
-                printf("%s: ", dados[linha]); gets(palavra);
+                printf("\n%s: ", dados[linha]); gets(palavra);
                 strcpy(arquivo[linhas], palavra);
                 fgets(buff, COL, fp);                           // Pula a linha
             }
@@ -153,7 +147,7 @@ int deletarPorCadastro(char numCad[4])
                 fprintf(fp, "%s", arquivo[j]);
         }
         fclose(fp);
-        --pQntCad;
+        --pQntCad; // Diminui a quantidade de Cadastros
     }
     return encontrou;
 }
@@ -175,7 +169,7 @@ void inserir()
     {
         fp = fopen(agendaTxt, "w");
         fprintf(fp, "Cadastro 1:\n");
-        fclose(fp);
+        fclose(fp); ++pLinhas;
     }
     else
     {
@@ -200,7 +194,7 @@ void inserir()
             fprintf(fp, "%s", agenda[j]);
         ++pLinhas;                              // Numero de linhas do arquivo aumenta
     }
-    ++pQntCad;
+    ++pQntCad; // Aumenta a quantidade de Cadastros
     printf("\n\n");
     fclose(fp);
 }
@@ -295,7 +289,7 @@ void menu ()
             system("cls");
             printf("Qual o numero de cadastro deseja alterar? "); gets(qualCad);
             if(!alterarCadastro(qualCad))
-                printf("Nao foi possivel alterar esse numero de cadastro. Verifique se o cadastro existe\n");
+                printf("\nNao foi possivel alterar esse numero de cadastro.\nVerifique se o cadastro existe\n\n");
             break;
 
         case 4:
@@ -331,7 +325,7 @@ void menu2()
         Sleep(500);
         system("cls");
         if (!listarTudo())
-            printf("Nao ha nenhum dado cadastrado para ser listado!\n");
+            printf("\nNao ha nenhum dado cadastrado para ser listado!\n\n");
         break;
 
     case 2:
@@ -340,7 +334,7 @@ void menu2()
         system("cls");
         printf("Digite o nome que deve ser buscado: "); gets(dado);
         if (!buscar(dado, 1))
-            printf("Nao foi possivel encontrar esse dado no banco.\n");
+            printf("\nNao foi possivel encontrar esse dado no banco.\n\n");
         break;
 
     case 3:
@@ -349,7 +343,7 @@ void menu2()
         system("cls");
         printf("Digite a cidade que deve ser buscada: "); gets(dado);
         if (!buscar(dado, 4))
-            printf("Nao foi possivel encontrar esse dado no banco.\n");
+            printf("\nNao foi possivel encontrar esse dado no banco.\n\n");
         break;
 
     case 4:
@@ -358,7 +352,7 @@ void menu2()
         system("cls");
         printf("Digite o estado que deve ser buscado: "); gets(dado);
         if (!buscar(dado, 5))
-            printf("Nao foi possivel encontrar esse dado no banco.\n");
+            printf("\nNao foi possivel encontrar esse dado no banco.\n\n");
         break;
 
     case 5:
@@ -399,9 +393,9 @@ void menu3()
         system("cls");
         printf("Digite qual cadastro deve ser apagado: "); gets(qualCad);
         if(!deletarPorCadastro(qualCad))
-            printf("Nao foi possivel apagar esse cadastro do arquivo. Verifique se o cadastro existe.\n");
+            printf("\nNao foi possivel apagar esse cadastro do arquivo. Verifique se o cadastro existe.\n\n");
         else
-            printf("O cadastro %s foi apagado.\n\n", qualCad);
+            printf("\nO cadastro %s foi apagado.\n\n", qualCad);
         break;
 
     case 3:
