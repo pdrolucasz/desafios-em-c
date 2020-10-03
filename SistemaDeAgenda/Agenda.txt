@@ -70,15 +70,6 @@ CE
 1563452
 112343
 12545466
-Cadastro 9:
-Daniel
-rua do p
-pairro
-Fortaleza-pae
-pestado
-pep30303
-123123123
-32342354
 Cadastro 10:
 Pedro
 rua de pEderpdep
@@ -88,15 +79,6 @@ pestado
 1234145
 123154345
 231534354
-Cadastro 11:
-G2A
-Eae Vei
-Parangaba
-Rio de Janeiro
-Rio de Janeiro
-902930293
-29329203
-309293092
 Cadastro 12:
 Eduardo
 Av gen 
@@ -106,3 +88,12 @@ Ceara
 123123   
 123123   
 232
+Cadastro 14:
+Pedro
+Endereco
+Bairro
+Cidade
+Estado
+123456
+12345678
+87654321
