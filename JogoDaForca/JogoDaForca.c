@@ -59,10 +59,7 @@ void inicializaArquivo()
         fp = fopen(palavrasSorTxt, "w"); // Cria arquivo
         for (int i = 0; i < ROW; ++i){
             strcpy(palavrasSecretas[i], palavrasSorteadas[i]); // Populando a palavrasSecretas para utilização no jogo.
-            if (i != ROW - 1)
-                fprintf(fp, "%s %s\n", palavrasSorteadas[i], categoriaPalavra[i]);
-            else
-                fprintf(fp, "%s %s\n", palavrasSorteadas[i], categoriaPalavra[i]);
+            fprintf(fp, "%s %s\n", palavrasSorteadas[i], categoriaPalavra[i]);
         }
         fclose(fp);
     }else { // Arquivo com palavras já existe. Pode haver novas palavras inseridas.
@@ -80,23 +77,6 @@ void inicializaArquivo()
     }
 }
 
-/// Escolhe as palavras de acordo com a categoria
-void escolheCategoria(int categoriaPS) {
-	obterLinhas();
-    fp = fopen(palavrasSorTxt, "r");
-    char buff[LEN];
-    int categoria;
-
-    for (int i = 0; i < numLinhas; ++i){
-        fscanf(fp, "\n%s %d", buff, &categoria);
-        if (categoria == categoriaPS) {
-            strcpy(palavrasSecretas[i], buff); // Adiciona cada palavra com a categoria escolhida na palavrasSecretas para utilização no jogo.
-		}
-    }
-    fclose(fp);
-    obterLinhas();
-}
-
 /// Obter número de linhas do arquivo
 int obterLinhas() {
 
@@ -112,7 +92,7 @@ int obterLinhas() {
 
 /// Inserir palavra no arquivo
 void inserirNoArquivo() {
-	char palavra[1][30];
+	char palavra[1][LEN];
 	int categoria = 0;
 	
 	printf("Digite a palavra: ");
@@ -134,7 +114,7 @@ void inserirNoArquivo() {
 
     for (int i = 0; i < numLinhas; ++i){
         fscanf(fp, "%s %d\n", buff, &categoriaFP);
-        possible = strcmp(palavra, buff);
+        possible = strcmp(palavra, buff);//checa se a palavra é igual
     }
     fclose(fp);
     
@@ -391,11 +371,12 @@ void menu()
     while(1)
     {
         int escolha = 0, indice;
+        printf("-------------------------------------------------\nJogo da Forca\n-------------------------------------------------\n");
         printf("1 - Jogar com uma palavra aleatoria.\n\n");
         printf("2 - Escolher categoria da palavra.\n\n");
         printf("3 - Inserir palavra\n\n");
         printf("4 - Sair\n\n");
-        //printf("4 - listar\n\n");
+        //printf("5 - listar\n\n");
         scanf("%d", &escolha);
         while (escolha < 1 || escolha > 4){
             printf("\nOpcao invalida! Escolha entre 1 e 4\n\n");
@@ -434,7 +415,7 @@ void menu()
                 inserirNoArquivo();
             }
             else
-                printf("\n\nNao pode inserir! Voce deve ganhar um jogo primeiro!\n\n");
+                printf("\nNao pode inserir! Voce deve ganhar um jogo primeiro!\n\n");
             break;
         case 4: // Fim do loop
             printf("\nOpcao (4) escolhida...\n\n");
@@ -496,6 +477,7 @@ int main()
 {
     srand(time(NULL));
     zeraExibidas = 1;
+    zerar(0);
     menu();
 
     return 0;
