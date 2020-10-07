@@ -10,11 +10,6 @@
 #define MAX 100
 #define CAT 3
 
-FILE *fp;
-int numLinhas = 0;
-char palavrasSorTxt[] = "palavrasJogo.txt";
-char categoriaS[3][15] = {"ALIMENTO", "ANIMAL", "COMPUTACAO"};
-
 int gerarAleatorio();
 void escolhePalavra();
 int verifLetraJogada(char letra);
@@ -33,6 +28,11 @@ void desenhaTrofeu();
 void zerar(int zeraExibidas);
 
 /// Variáveis globais
+FILE *fp;
+int numLinhas = 0;
+char palavrasSorTxt[] = "palavrasJogo.txt";
+char categoriaS[3][15] = {"ALIMENTO", "ANIMAL", "COMPUTACAO"};
+
 char palavrasSecretas[MAX][LEN], palavrasSorteadas[ROW][LEN] = {"MELANCIA" ,
                                                                 "PERA" ,
                                                                 "BANANA" ,
@@ -45,14 +45,12 @@ char palavrasSecretas[MAX][LEN], palavrasSorteadas[ROW][LEN] = {"MELANCIA" ,
                                                                 "JAVASCRIPT" ,
                                                                 "PONTEIRO" ,
                                                                 "PYTHON" };
-                                                                
-int categorias[100];
 
 char categoriaPalavra[ROW][2] = {"1", "1", "1", "1", "2", "2", "2", "2", "3", "3", "3", "3"};
 
 char palavra[LEN], palavrasExibidas[ROW], palavraEncripto[LEN], letraJogada[26];
 
-int podeInserir = 0, zeraExibidas, categoriaEscolhida = 0;
+int podeInserir = 0, zeraExibidas, categoriaEscolhida = 0, categorias[100];
 
 /// Inicializar arquivo e preenche a matriz das palavras do jogo
 void inicializaArquivo()
@@ -400,7 +398,7 @@ void menu()
         //printf("4 - listar\n\n");
         scanf("%d", &escolha);
         while (escolha < 1 || escolha > 4){
-            printf("\nOpcao invalida! Escolha entre 1 e 3\n\n");
+            printf("\nOpcao invalida! Escolha entre 1 e 4\n\n");
             scanf("%d", &escolha);
         }
 
@@ -436,7 +434,7 @@ void menu()
                 inserirNoArquivo();
             }
             else
-                printf("Nao pode inserir! Voce deve ganhar um jogo primeiro!\n");
+                printf("\n\nNao pode inserir! Voce deve ganhar um jogo primeiro!\n\n");
             break;
         case 4: // Fim do loop
             printf("\nOpcao (4) escolhida...\n\n");
