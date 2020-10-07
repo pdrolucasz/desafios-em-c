@@ -45,12 +45,14 @@ char palavrasSecretas[MAX][LEN], palavrasSorteadas[ROW][LEN] = {"MELANCIA" ,
                                                                 "JAVASCRIPT" ,
                                                                 "PONTEIRO" ,
                                                                 "PYTHON" };
+                                                                
+int categorias[100];
 
 char categoriaPalavra[ROW][2] = {"1", "1", "1", "1", "2", "2", "2", "2", "3", "3", "3", "3"};
 
 char palavra[LEN], palavrasExibidas[ROW], palavraEncripto[LEN], letraJogada[26];
 
-int podeInserir = 0, zeraExibidas;
+int podeInserir = 0, zeraExibidas, categoriaEscolhida = 0;
 
 /// Inicializar arquivo e preenche a matriz das palavras do jogo
 void inicializaArquivo()
@@ -74,6 +76,7 @@ void inicializaArquivo()
         for (int i = 0; i < numLinhas; ++i){
             fscanf(fp, "\n%s %d", buff, &categoria); // Descarta o inteiro da categoria presente no arquivo, o importante é a palavra
             strcpy(palavrasSecretas[i], buff); // Adiciona cada palavra nova na palavrasSecretas para utilização no jogo.
+            categorias[i] = categoria;
         }
         fclose(fp);
     }
@@ -161,12 +164,23 @@ void escolhePalavra()
     int jaExibiu = 1, indice;
     while (jaExibiu == 1){
         indice = gerarAleatorio();
-
-        // checa se a palavra ja foi exibida antes.
-        if (palavrasExibidas[indice] == '1')
-            jaExibiu = 1;
-        else
-            jaExibiu = 0;
+        
+        if(categoriaEscolhida != 0){
+        	while(categorias[indice] != categoriaEscolhida){
+	        	indice = gerarAleatorio();
+			}
+			// checa se a palavra ja foi exibida antes.
+		    if (palavrasExibidas[indice] == '1')
+		        jaExibiu = 1;
+		    else
+		        jaExibiu = 0;
+		}else{
+			// checa se a palavra ja foi exibida antes.
+			if (palavrasExibidas[indice] == '1')
+			    jaExibiu = 1;
+			else
+			    jaExibiu = 0;
+		}
     }
     strcpy(palavra, palavrasSecretas[indice]);
 
@@ -380,11 +394,12 @@ void menu()
     {
         int escolha = 0, indice;
         printf("1 - Jogar com uma palavra aleatoria.\n\n");
-        printf("2 - Inserir palavra\n\n");
-        printf("3 - Sair\n\n");
+        printf("2 - Escolher categoria da palavra.\n\n");
+        printf("3 - Inserir palavra\n\n");
+        printf("4 - Sair\n\n");
         //printf("4 - listar\n\n");
         scanf("%d", &escolha);
-        while (escolha < 1 || escolha > 3){
+        while (escolha < 1 || escolha > 4){
             printf("\nOpcao invalida! Escolha entre 1 e 3\n\n");
             scanf("%d", &escolha);
         }
@@ -400,8 +415,22 @@ void menu()
             jogar();
             break;
         case 2:
+        	printf("\nOpcao (2) escolhida...\n\n");
+        	Sleep(1000);
+            system("cls");
+        	printf("Escolha uma categoria: \n\n");
+			for (int i = 0; i < CAT; i++) {
+				printf("%d - %s\n", i + 1, categoriaS[i]);
+			}
+			printf("\n\nDigite a categoria: ");
+			scanf("%d", &categoriaEscolhida);
+			zerar(zeraExibidas);
+            zeraExibidas = 0;
+			jogar();
+			break;
+        case 3:
             if (podeInserir){
-                printf("\nOpcao (2) escolhida...\n\n");
+                printf("\nOpcao (3) escolhida...\n\n");
                 Sleep(1000);
                 system("cls");
                 inserirNoArquivo();
@@ -409,10 +438,10 @@ void menu()
             else
                 printf("Nao pode inserir! Voce deve ganhar um jogo primeiro!\n");
             break;
-        case 3: // Fim do loop
-            printf("\nOpcao (3) escolhida...\n\n");
+        case 4: // Fim do loop
+            printf("\nOpcao (4) escolhida...\n\n");
             return;
-        case 4:
+        case 5:
             listar();
             break;
         }
@@ -426,7 +455,7 @@ void zerar(int primeiraVez)
         palavraEncripto[i] = '*';
     }
     letraJogada[0] = '\0';
-    escolheCategoria(1);
+    inicializaArquivo();
     if (primeiraVez){
         for (int j = 0; j < ROW; ++j)
             palavrasExibidas[j] = '0';
