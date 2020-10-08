@@ -92,7 +92,7 @@ int obterLinhas() {
 
 /// Inserir palavra no arquivo
 void inserirNoArquivo() {
-	char palavra[1][LEN];
+	char palavra[LEN];
 	int categoria = 0;
 	
 	printf("Digite a palavra: ");
@@ -122,7 +122,7 @@ void inserirNoArquivo() {
         printf("\n\nPalavra ja adicionada.\n\n");
 	}else {
 		fp = fopen(palavrasSorTxt, "a");
-	    fprintf(fp, "%s %d\n", palavra[0], categoria);
+	    fprintf(fp, "%s %d\n", palavra, categoria);
 		fclose(fp);
 		inicializaArquivo();
 		Sleep(1000);
@@ -344,7 +344,6 @@ void jogar()
 
     interfaceJogo(erros, tamanho);
     if (perdeu){
-        podeInserir = 0;
         desenhaCaveira();
         printf("Deu forca! Suas chances acabaram!\n\nA palavra era %s.\n\n", palavra);
     }
