@@ -5,84 +5,79 @@
 #include <time.h>
 #include <windows.h>
 
-#define ROW 12
-#define LEN 30
-#define MAX 100
-#define CAT 3
+#define NUM_PAL_INI 12  // Numéro de palavras iniciais do jogo
+#define TAM_PAL 30      // Tamanho máximo da palavra
+#define MAX_PAL 100     // Número máximo de palavras no jogo
+#define NUM_CAT 4       // Número de categorias de palavras
 
+void desenhaCaveira();
+void desenhaForca(int erros);
+void desenhaTrofeu();
+void dificuldade();
+void escolhePalavra(int categoriaEscolhida);
+int existeArquivo(char* arquivo);
+void guardaPalavraECategoria();
 int gerarAleatorio();
-void escolhePalavra();
+void inicializaArquivo();
+int inserirNoArquivo(char palavra[TAM_PAL], int categoria);
+void interfaceJogo(int erros, int tamanho);
+void jogar(int categoriaEscolhida);
+int listar();
+int main();
+void menu();
+int obterLinhas();
+int verifCatExibida(int categoriaEscolhida);
+int verifLetraEspecial(char letra);
 int verifLetraJogada(char letra);
 int verifPalavraLetra(char letra, int tamanho);
 int verifVenceu(int tamanho);
-void desenhaForca(int erros);
-int existeArquivo(char* arquivo);
-void interfaceJogo(int erros, int tamanho);
-void dificuldade();
-void jogar();
-void menu();
-int obterLinhas();
-void inserirPalavra(int podeInserir);
-void desenhaCaveira();
-void desenhaTrofeu();
 void zerar(int zeraExibidas);
 
 /// Variáveis globais
 FILE *fp;
 int numLinhas = 0;
-char palavrasSorTxt[] = "palavrasJogo.txt";
-char categoriaS[3][15] = {"ALIMENTO", "ANIMAL", "COMPUTACAO"};
+char arqPalavrasTxt[] = "ArquivoPalavras.txt";
+char categoriaS[NUM_CAT][15] = {"ALIMENTO", "ANIMAL", "COMPUTACAO", "ESPORTE"};
 
-char palavrasSecretas[MAX][LEN], palavrasSorteadas[ROW][LEN] = {"MELANCIA" ,
-                                                                "PERA" ,
-                                                                "BANANA" ,
-                                                                "CAJU" ,
-                                                                "ZEBRA" ,
-                                                                "MACACO" ,
-                                                                "URUBU" ,
-                                                                "LEBRE" ,
-                                                                "FLIPFLOP" ,
-                                                                "JAVASCRIPT" ,
-                                                                "PONTEIRO" ,
-                                                                "PYTHON" };
+char palavrasSecretas[MAX_PAL][TAM_PAL], palavrasIniciais[NUM_PAL_INI][TAM_PAL] = {"MELANCIA 1" ,
+                                                                                    "PERA 1" ,
+                                                                                    "BANANA 1" ,
+                                                                                    "CAJU 1" ,
+                                                                                    "ZEBRA 2" ,
+                                                                                    "MACACO 2" ,
+                                                                                    "URUBU 2" ,
+                                                                                    "LEBRE 2" ,
+                                                                                    "FLIPFLOP 3" ,
+                                                                                    "JAVASCRIPT 3" ,
+                                                                                    "PONTEIRO 3" ,
+                                                                                    "PYTHON 3" };
 
-char categoriaPalavra[ROW][2] = {"1", "1", "1", "1", "2", "2", "2", "2", "3", "3", "3", "3"};
+char palavra[TAM_PAL], palavrasExibidas[MAX_PAL], palavraEncripto[TAM_PAL], letraJogada[26];
 
-char palavra[LEN], palavrasExibidas[ROW], palavraEncripto[LEN], letraJogada[26];
+int podeInserir = 0, categoriaPalavra[MAX_PAL];
 
-int podeInserir = 0, zeraExibidas, categoriaEscolhida = 0, categorias[100];
-
-/// Inicializar arquivo e preenche a matriz das palavras do jogo
+/// Inicializar arquivo com as palavras iniciais do jogo
 void inicializaArquivo()
 {
-    if (!existeArquivo(palavrasSorTxt)){ // Arquivo do jogo não existe, é a primeira vez jogando. Cria-se o arquivo com as palavras e as categorias.
-        fp = fopen(palavrasSorTxt, "w"); // Cria arquivo
-        for (int i = 0; i < ROW; ++i){
-            strcpy(palavrasSecretas[i], palavrasSorteadas[i]); // Populando a palavrasSecretas para utilização no jogo.
-            fprintf(fp, "%s %s\n", palavrasSorteadas[i], categoriaPalavra[i]);
-        }
-        fclose(fp);
-    }else { // Arquivo com palavras já existe. Pode haver novas palavras inseridas.
-        obterLinhas();
-        fp = fopen(palavrasSorTxt, "r");
-        char buff[LEN];
-        int categoria;
-
-        for (int i = 0; i < numLinhas; ++i){
-            fscanf(fp, "\n%s %d", buff, &categoria); // Descarta o inteiro da categoria presente no arquivo, o importante é a palavra
-            strcpy(palavrasSecretas[i], buff); // Adiciona cada palavra nova na palavrasSecretas para utilização no jogo.
-            categorias[i] = categoria;
+    if (!existeArquivo(arqPalavrasTxt)){ // Arquivo do jogo não existe, é a primeira vez jogando. Cria-se o arquivo com as palavras e as categorias.
+        fp = fopen(arqPalavrasTxt, "w"); // Cria arquivo
+        for (int i = 0; i < NUM_PAL_INI; ++i){
+            if (i != NUM_PAL_INI - 1)
+                fprintf(fp, "%s\n", palavrasIniciais[i]);
+            else
+                fprintf(fp, "%s", palavrasIniciais[i]);
         }
         fclose(fp);
     }
 }
 
 /// Obter número de linhas do arquivo
-int obterLinhas() {
-
+int obterLinhas()
+{
+    if (!existeArquivo(arqPalavrasTxt))
+        return 0;
 	char buff[255];
-	fp = fopen(palavrasSorTxt, "r");
-	numLinhas = 0;
+	fp = fopen(arqPalavrasTxt, "r");
     while (fgets(buff, 255, (FILE*)fp) != NULL)
         numLinhas ++;
 	fclose(fp);
@@ -91,79 +86,74 @@ int obterLinhas() {
 }
 
 /// Inserir palavra no arquivo
-void inserirNoArquivo() {
-	char palavra[LEN];
-	int categoria = 0;
-	
-	printf("Digite a palavra: ");
-	scanf("%s", palavra);
-	strupr(palavra);
-	
-	printf("Escolha uma categoria: \n\n");
-	for (int i = 0; i < CAT; i++) {
-		printf("%d - %s\n", i + 1, categoriaS[i]);
-	}
-	printf("\n\nDigite a categoria: ");
-	scanf("%d", &categoria);
-	
-	int possible = 0;
-	
-	fp = fopen(palavrasSorTxt, "r");
-    char buff[LEN];
-    int categoriaFP;
-
+int inserirNoArquivo(char palavra[TAM_PAL], int categoria)
+{
+	fp = fopen(arqPalavrasTxt, "r"); // Se é possível adicionar novas palavras, então o arquivo já existe
+    char buff[TAM_PAL];
+    int lixo;
     for (int i = 0; i < numLinhas; ++i){
-        fscanf(fp, "%s %d\n", buff, &categoriaFP);
-        possible = strcmp(palavra, buff);//checa se a palavra é igual
+        fscanf(fp, "%s %d", buff, &lixo); // Descarta a categoria
+        if (strcmp(buff, palavra) == 0)
+            return 0;
     }
     fclose(fp);
-    
-    if (possible == 0) {
-        printf("\n\nPalavra ja adicionada.\n\n");
-	}else {
-		fp = fopen(palavrasSorTxt, "a");
-	    fprintf(fp, "%s %d\n", palavra, categoria);
-		fclose(fp);
-		inicializaArquivo();
-		Sleep(1000);
-	    system("cls");
-	}
+    fp = fopen(arqPalavrasTxt, "a");
+    fprintf(fp, "\n%s %d", palavra, categoria);
+    fclose(fp);
+
+    strcpy(palavrasSecretas[numLinhas], palavra);
+    categoriaPalavra[numLinhas] = categoria;
+    ++numLinhas; // Incrementa o número de linhas do arquivo
+
+    return 1;
 }
 
-/// Gera o número aleatório entre 0 e o número de palavras secretas
+/// Guarda os valores das linhas do arquivo em arrays
+void guardaPalavraECategoria()
+{
+    fp = fopen(arqPalavrasTxt, "r");
+    char buff[TAM_PAL];
+    int categoria;
+
+    for (int i = 0; i < numLinhas; ++i){
+        fscanf(fp, "%s %d", buff, &categoria);      // Obtem a palavra e o inteiro de categoria.
+        strcpy(palavrasSecretas[i], buff);          // Adiciona cada palavra na palavrasSecretas ...
+        categoriaPalavra[i] = categoria;            // ... e cada categoria na categoriaPalavra para utilização no jogo.
+    }
+    fclose(fp);
+}
+
+/// Gera o número aleatório entre 1 e o número de palavras secretas
 int gerarAleatorio()
 {
     return rand() % numLinhas;
 }
 
-/// Escolhe a palavra que será jogada
-void escolhePalavra()
-{
+/// Escolhe a palavra que será jogada de acordo com a categoria
+void escolhePalavra(int categoriaEscolhida) // Checa se a palavra ja foi exibida antes.
+{                                           // Checa se a linha gerada possui uma palavra da mesma categoria escolhida pelo usuário.
     int jaExibiu = 1, indice;
     while (jaExibiu == 1){
         indice = gerarAleatorio();
-        
-        if(categoriaEscolhida != 0){
-        	while(categorias[indice] != categoriaEscolhida){
-	        	indice = gerarAleatorio();
-			}
-			// checa se a palavra ja foi exibida antes.
-		    if (palavrasExibidas[indice] == '1')
-		        jaExibiu = 1;
-		    else
-		        jaExibiu = 0;
-		}else{
-			// checa se a palavra ja foi exibida antes.
-			if (palavrasExibidas[indice] == '1')
-			    jaExibiu = 1;
-			else
-			    jaExibiu = 0;
-		}
+        if (palavrasExibidas[indice] == '0' && categoriaPalavra[indice] == categoriaEscolhida){
+            jaExibiu = 0;
+        }
     }
     strcpy(palavra, palavrasSecretas[indice]);
+    palavrasExibidas[indice] = '1';             // Se a palavra nao foi exibida antes, entao adicione ao palavrasExibidas um número 1
+}
 
-    // Se a palavra nao foi exibida antes, entao adicione ao palavrasExibidas um número 1
-    palavrasExibidas[indice] = '1';
+/// Verifica se todas as palavras da categoria já foram exibidas
+int verifCatExibida(int categoriaEscolhida){
+	int contCat = 0;
+	for(int i = 0; i < numLinhas; ++i){
+		if(categoriaPalavra[i] == categoriaEscolhida){
+			if(palavrasExibidas[i] == '0'){
+				return 1; // Existe pelo menos uma palavra não exibida
+			}
+		}
+	}
+	return 0;
 }
 
 /// Verifica se o arquivo existe
@@ -172,6 +162,7 @@ int existeArquivo(char *arquivo)
     fp = fopen(arquivo, "r");
     if (!fp)
         return 0; /* nao existe */
+    fclose(fp);
     return 1; /* existe */
 }
 
@@ -184,18 +175,17 @@ int verifLetraJogada(char letra)
     return 1;
 }
 
-/// Verifica se a letra é um número
+/// Verifica se a letra é um caractere especial
 int verifLetraEspecial(char letra)
 {
-	if ((letra >= 'a' && letra <= 'z') || 
-	(letra >= 'A' && letra <= 'Z')) {
+	if ((letra >= 'a' && letra <= 'z') || (letra >= 'A' && letra <= 'Z')) {
 		return 1;
 	}else {
 		return 0;
 	}
 }
 
-/// Verifica se a palavra possui a letra
+/// Verifica se a palavra possui a letra que foi jogada
 int verifPalavraLetra(char letra, int tamanho)
 {
     int aux = 0;
@@ -248,12 +238,12 @@ void interfaceJogo(int hangman, int tamanho)
     printf("Palavra Secreta: ");
     for (int j = 0; j < tamanho; ++j) {
     	if (palavraEncripto[j] != '*'){
-            //Sleep(550);
-            //Beep(500, 550);
+            Sleep(200);
+            Beep(500, 200);
             printf("%c", palavraEncripto[j]);
         }else {
-            //Sleep(550);
-            //Beep(1000, 550);
+            Sleep(200);
+            Beep(1000, 200);
             printf("%c", palavraEncripto[j]);
 		}
 	}
@@ -265,7 +255,7 @@ void interfaceJogo(int hangman, int tamanho)
 void dificuldade(int * hangman)
 {
     int nivel = 1;
-    printf("Com qual dificuldade deseja jogar?\n\n1 - Normal\n2 - Dificil\n3 - Impossivel\n\n"); scanf("%d", &nivel);
+    printf("\nCom qual dificuldade deseja jogar?\n\n1 - Normal\n\n2 - Dificil\n\n3 - Impossivel\n\n"); scanf("%d", &nivel);
     while (nivel < 1 || nivel > 3){
         printf("\nOpcao invalida! Escolha entre 1 e 3\n");
         scanf("%d", &nivel);
@@ -287,12 +277,12 @@ void dificuldade(int * hangman)
 }
 
 /// O Jogo
-void jogar()
+void jogar(int categoriaEscolhida)
 {
-    int jaExibiu = 1, erros = 0, *pErros = &erros;
-
+    int erros = 0, *pErros = &erros;
+    
+	escolhePalavra(categoriaEscolhida);
     dificuldade(pErros);
-    escolhePalavra();
 
     int tamanho = strlen(palavra), acertos, venceu = 0, perdeu = 0;
     char letra;
@@ -304,7 +294,7 @@ void jogar()
         printf("Digite uma letra: ");
         scanf("%c", &letra);
         letra = toupper(letra);
-        
+
         while (!verifLetraEspecial(letra)) {
         	printf("\n\nIsso nao e uma letra (•_•), Digite uma letra: ");
         	scanf(" %c", &letra);
@@ -315,7 +305,7 @@ void jogar()
             printf("\n\nEssa letra ja foi jogada! Digite uma letra: ");
             scanf(" %c", &letra);
             letra = toupper(letra);
-            
+
             while (!verifLetraEspecial(letra)) {
 	        	printf("\n\nIsso nao e uma letra (•_•), Digite uma letra: ");
 	        	scanf(" %c", &letra);
@@ -352,16 +342,29 @@ void jogar()
         podeInserir = 1;
         printf("Parabens! Voce ganhou!\n\nA palavra era %s.\n\n", palavra);
     }
+    zerar(0);
     Sleep(1000);
 }
 
 /// Lista as palavras que tem no arquivo. (Atenção! Só adms podem executar)
-void listar()
+int listar()
 {
-    obterLinhas();
-    for (int i = 0; i < numLinhas; ++i){
-        printf("%s\n", palavrasSecretas[i]);
+    if (!existeArquivo(arqPalavrasTxt))
+        return 0;
+    char buffer[TAM_PAL];
+    fp = fopen(arqPalavrasTxt, "r");
+    printf("\nNo arquivo:\n\n-----------------\n");
+    for (int j = 0; j < numLinhas; ++j){
+        fgets(buffer, TAM_PAL, fp);
+        printf("%s", buffer);
     }
+    printf("\n-----------------\n\nNos arrays:\n\n");
+    for( int i = 0; i < numLinhas; ++i){
+        printf("Linha: %d\tPalavra: %s           \tCategoria: %d \tExibida: %c\n", i, palavrasSecretas[i], categoriaPalavra[i], palavrasExibidas[i]);
+    }
+    fclose(fp);
+    printf("\nTotal de linhas (numlinhas): %d\n\n", numLinhas);
+    return 1;
 }
 
 /// Menu será mostrado mesmo após o fim de um jogo.
@@ -369,73 +372,87 @@ void menu()
 {
     while(1)
     {
-        int escolha = 0, indice;
+        int escolha = 0, categoriaEscolhida;
+        char palavra[TAM_PAL];
         printf("-------------------------------------------------\nJogo da Forca\n-------------------------------------------------\n");
-        printf("1 - Jogar com uma palavra aleatoria.\n\n");
-        printf("2 - Escolher categoria da palavra.\n\n");
-        printf("3 - Inserir palavra\n\n");
-        printf("4 - Sair\n\n");
-        //printf("5 - listar\n\n");
+        printf("1 - Jogar\n\n");
+        if (podeInserir)
+            printf("2 - Inserir nova palavra\n\n");     // Se existir opção de inserir palavra, a numeração das escolhas mudará.
+        printf("%d - Sair\n\n", podeInserir ? 3 : 2);   // A opção 2 será a 3 (sair) quando não for possível inserir nova palavra.
         scanf("%d", &escolha);
-        while (escolha < 1 || escolha > 4){
-            printf("\nOpcao invalida! Escolha entre 1 e 4\n\n");
+        while (escolha < 1 || escolha > 4){ // Para testes: escolhas > 4 // Para produção: escolhas > podeInserir ? 3 : 2
+            printf("\nOpcao invalida! Escolha entre 1 e %d\n\n", podeInserir ? 3 : 2);
             scanf("%d", &escolha);
         }
+        // Verifica se existe a opção de inserir palavra. Se não existir, a opção 2 será a 3 (sair)
+        if (!podeInserir) escolha = (escolha != 1 ? ++escolha : 1);
 
         switch (escolha)
         {
         case 1:
-            printf("\nOpcao (1) escolhida...\n\n");
-            Sleep(1000);
-            system("cls");
-            zerar(zeraExibidas);
-            zeraExibidas = 0;
-            jogar();
-            break;
-        case 2:
-        	printf("\nOpcao (2) escolhida...\n\n");
-        	Sleep(1000);
-            system("cls");
-        	printf("Escolha uma categoria: \n\n");
-			for (int i = 0; i < CAT; i++) {
-				printf("%d - %s\n", i + 1, categoriaS[i]);
+        	printf("\nOpcao (1) escolhida...\n\n");
+			Sleep(500);
+			system("cls");
+			printf("Escolha uma categoria: \n");
+			for (int i = 0; i < NUM_CAT; i++) {
+				printf("%d - %s\n\n", i + 1, categoriaS[i]);
 			}
-			printf("\n\nDigite a categoria: ");
 			scanf("%d", &categoriaEscolhida);
-			zerar(zeraExibidas);
-            zeraExibidas = 0;
-			jogar();
+			while (categoriaEscolhida < 1 || categoriaEscolhida > NUM_CAT){
+			    printf("\nOpcao invalida! Escolha entre 1 e %d\n\n", NUM_CAT);
+			    scanf("%d", &categoriaEscolhida);
+			}
+        	if(verifCatExibida(categoriaEscolhida)){
+				jogar(categoriaEscolhida);
+			}else{
+				printf("\nParabens, voce esgotou o banco de palavras dessa categoria(•_•).\n\n");
+			}
 			break;
-        case 3:
-            if (podeInserir){
-                printf("\nOpcao (3) escolhida...\n\n");
-                Sleep(1000);
-                system("cls");
-                inserirNoArquivo();
+        case 2:
+            printf("\nOpcao (2) escolhida...\n\n");
+            Sleep(500);
+            system("cls");
+            printf("Escolha uma categoria a qual a palavra deve ser adicionada: \n");
+			for (int i = 0; i < NUM_CAT; i++) {
+				printf("%d - %s\n\n", i + 1, categoriaS[i]);
+			}
+			scanf("%d", &categoriaEscolhida);
+			while (categoriaEscolhida < 1 || categoriaEscolhida > NUM_CAT){
+                printf("\nOpcao invalida! Escolha entre 1 e %d\n\n", NUM_CAT);
+                scanf("%d", &categoriaEscolhida);
             }
+            printf("\nDigite a palavra: ");
+            scanf("%s", palavra);
+            strupr(palavra); // Deixa as letras maiúsculas
+
+            if (!inserirNoArquivo(palavra, categoriaEscolhida))
+                printf("\nPalavra ja adicionada.\n\n");
             else
-                printf("\nNao pode inserir! Voce deve ganhar um jogo primeiro!\n\n");
+                printf("\nPalavra adicionada com sucesso.\n\n");
             break;
-        case 4: // Fim do loop
-            printf("\nOpcao (4) escolhida...\n\n");
+        case 3: // Fim do loop
+            printf("\nOpcao (%d) escolhida...\n\n", podeInserir ? 3 : 2);
             return;
-        case 5:
-            listar();
+        case 4:
+            if (!listar())
+                printf("\nNao foi possivel ler o arquivo.\n\n");
             break;
         }
     }
 }
 
-/// Limpa os dados de um jogo anterior, se for o primeiro jogo, zera o array de palavrasExibidas
+/// Limpa os dados de um jogo anterior. Se for o primeiro jogo, zera o array de palavrasExibidas e obtem o número de palavras (linhas) do arquivo
 void zerar(int primeiraVez)
 {
-    for (int i = 0; i < LEN; ++i){
+    for (int i = 0; i < TAM_PAL; ++i){
         palavraEncripto[i] = '*';
     }
     letraJogada[0] = '\0';
-    inicializaArquivo();
     if (primeiraVez){
-        for (int j = 0; j < ROW; ++j)
+        inicializaArquivo();
+        obterLinhas();
+        guardaPalavraECategoria();
+        for (int j = 0; j < MAX_PAL; ++j)
             palavrasExibidas[j] = '0';
     }
 }
@@ -448,7 +465,7 @@ void desenhaCaveira()
 
     printf("\n     .-\"\"\"-.  \n");
     printf("    / _   _ \\\n");
-    printf("    ](_' '_)[ \n");
+    printf("    ](^' '^)[ \n");
     printf("    `-. N .-%c \n", agudoChar);
     printf("      |||||   \n", agudoChar);
     printf("      `---%c   \n\n\n", agudoChar);
@@ -475,9 +492,16 @@ void desenhaTrofeu()
 int main()
 {
     srand(time(NULL));
-    zeraExibidas = 1;
-    zerar(0);
+    zerar(1);
+    
+    /// Para testes
+    /*for(int i = 8; i < 12; ++i){
+    	palavrasExibidas[i] = '1';
+	}
+	
+    podeInserir = 1;*/
     menu();
 
     return 0;
 }
+
