@@ -209,12 +209,12 @@ void listarPorCadastro(char cadastro[20])
     {
         if(linhas % 9 == 0)                             // É linha de cadastro "Cadastro []:".
             if (strcmp(buffer, cadastro) == 0){         // Verifica se a linha atual corresponde ao cadastro
-                printf("%s", cadastro);
+                printf("%s\n", cadastro);
                 for (int i = 0; i < 8; ++i){            // Lendo todas as 8 linhas seguintes (dados do cadastro)
                     fgets(buffer, COL, fp);
-                    printf("%s: %s", dados[i], buffer);
+                    printf("%s: %s\n", dados[i], buffer);
                 }
-                printf("\n");
+                printf("\n\n");
                 fclose(fp);
                 break;                                  // Já encontrei o cadastro, sem necessidade de continuar buscando no arquivo.
             }
@@ -233,9 +233,9 @@ int listarTudo()
         for (int j = 0; j <= ROW; ++j){
             fgets(buffer, COL, fp);
             if (j)
-                printf("%s: %s", dados[j-1], buffer);
+                printf("%s: %s\n", dados[j-1], buffer);
             else
-                printf("%s", buffer);
+                printf("%s\n", buffer);
         }
         printf("\n\n");
     }
